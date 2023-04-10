@@ -1,22 +1,23 @@
+import 'package:flame/components.dart';
+import 'package:flame_and_watch/settings_manager.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:meta/meta.dart';
-import 'package:flame/position.dart';
-import 'package:flame/flame.dart';
-
-import '../settings_manager.dart';
 
 enum GameDigitalDisplaySize {
-  SMALL, MEDIUM, BIG,
+  SMALL,
+  MEDIUM,
+  BIG,
 }
 
 class GameDigitalDisplay {
-  final Position position;
+  final Vector2 position;
   String text;
   final GameDigitalDisplaySize size;
 
   GameDigitalDisplay({
-      @required this.position,
-      this.text = '',
-      this.size = GameDigitalDisplaySize.SMALL,
+    @required this.position,
+    this.text = '',
+    this.size = GameDigitalDisplaySize.SMALL,
   });
 }
 
@@ -48,8 +49,8 @@ abstract class FlameWatchGameController {
 
   GameSprite findSprite(String id) {
     return cartridge.gameSprites.firstWhere(
-        (s) => s.id == id,
-        orElse: () => null,
+      (s) => s.id == id,
+      orElse: () => null,
     );
   }
 
@@ -59,7 +60,7 @@ abstract class FlameWatchGameController {
 
   void sfx(String file) {
     if (SettingsManager.isSoundOn()) {
-      Flame.audio.play('sfxs/$file');
+      FlameAudio.play('sfxs/$file');
     }
   }
 

@@ -1,23 +1,19 @@
-import 'package:flame/game.dart';
-import 'package:flame/flame.dart';
-import 'package:flame/keyboard.dart';
-import 'package:flame/sprite.dart';
-import 'package:flame/position.dart';
-import 'package:flame/time.dart';
-import 'package:flame/text_config.dart';
-import 'package:flutter/services.dart';
-
-import 'dart:ui';
 import 'dart:math';
 
-import './cartridge.dart';
-import './layer.dart';
-import './processors.dart';
+import 'package:flame/components.dart';
+import 'package:flame/events.dart';
+import 'package:flame/flame.dart';
+import 'package:flame/game.dart';
+import 'package:flame/layers.dart';
+import 'package:flame_and_watch/game/cartridge.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FlameWatchGame extends Game with KeyboardEvents {
   static Paint _backgroundPaint = Paint()..color = const Color(0xFF8D9E8C);
   static const GAME_RESOLUTION = const Size(128, 96);
-  static Rect gameRect = Rect.fromLTWH(0, 0, GAME_RESOLUTION.width, GAME_RESOLUTION.height);
+  static Rect gameRect =
+      Rect.fromLTWH(0, 0, GAME_RESOLUTION.width, GAME_RESOLUTION.height);
 
   FlameWatchGameController _controller;
   Timer _ticker;
@@ -42,7 +38,7 @@ class FlameWatchGame extends Game with KeyboardEvents {
 
     final spriteLoading = gameCartridge.sprites.entries.map((entry) {
       return Flame.images.fromBase64(entry.key, entry.value).then((image) {
-        game._loadedSprites[entry.key] = Sprite.fromImage(image);
+        game._loadedSprites[entry.key] = Sprite(image);
       });
     }).toList();
     await Future.wait(spriteLoading);
@@ -57,7 +53,7 @@ class FlameWatchGame extends Game with KeyboardEvents {
       '${gameCartridge.gameName}-background-image',
       gameCartridge.background,
     );
-    game._backgroundLayer = _BackgroundLayer(Sprite.fromImage(_backgroundImage));
+    game._backgroundLayer = _BackgroundLayer(Sprite(_backgroundImage));
 
     final scaleRaw = min(
       gameSize.height / GAME_RESOLUTION.height,
@@ -65,23 +61,27 @@ class FlameWatchGame extends Game with KeyboardEvents {
     );
 
     game._gameScale = scaleRaw - scaleRaw % 0.02;
-    game._offset = (gameSize.width - GAME_RESOLUTION.width * game._gameScale) / 2;
-    game._ticker = Timer(gameCartridge.tickTime, repeat: true, callback: game._tick)..start();
+    game._offset =
+        (gameSize.width - GAME_RESOLUTION.width * game._gameScale) / 2;
+    game._ticker =
+        Timer(gameCartridge.tickTime, repeat: true, onTick: game._tick)
+          ..start();
 
     return game;
   }
 
   @override
-  void onKeyEvent(event) {
+  KeyEventResult onKeyEvent(event, keysPressed) {
     if (event is RawKeyUpEvent) {
       if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
         onLeft();
-        return;
+        return KeyEventResult.handled;
       } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
         onRight();
-        return;
+        return KeyEventResult.handled;
       }
     }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -130,7 +130,7 @@ class _BackgroundLayer extends PreRenderedLayer {
 
   @override
   void drawLayer() {
-    background.renderPosition(canvas, Position(0, 0));
+    background.render(canvas, position: Vector2(0, 0));
   }
 }
 
@@ -139,23 +139,26 @@ class _GameLayer extends DynamicLayer {
   FlameWatchGameCartridge cartridge;
   FlameWatchGameController controller;
 
-  final TextConfig _smallDigitalFont = TextConfig(
+  final TextPaint _smallDigitalFont = TextPaint(
+      style: const TextStyle(
     fontSize: 14,
     color: const Color(0xFF000000),
     fontFamily: 'Crystal',
-  );
+  ));
 
-  final TextConfig _mediumDigitalFont = TextConfig(
+  final TextPaint _mediumDigitalFont = TextPaint(
+      style: const TextStyle(
     fontSize: 18,
     color: const Color(0xFF000000),
     fontFamily: 'Crystal',
-  );
+  ));
 
-  final TextConfig _bigDigitalFont = TextConfig(
+  final TextPaint _bigDigitalFont = TextPaint(
+      style: const TextStyle(
     fontSize: 22,
     color: const Color(0xFF000000),
     fontFamily: 'Crystal',
-  );
+  ));
 
   _GameLayer(this.sprites, this.cartridge, this.controller) {
     preProcessors.add(
@@ -171,7 +174,9 @@ class _GameLayer extends DynamicLayer {
     cartridge.digitalDisplays.values.forEach((display) {
       final textConfig = display.size == GameDigitalDisplaySize.SMALL
           ? _smallDigitalFont
-          : display.size == GameDigitalDisplaySize.MEDIUM ? _mediumDigitalFont : _bigDigitalFont;
+          : display.size == GameDigitalDisplaySize.MEDIUM
+              ? _mediumDigitalFont
+              : _bigDigitalFont;
 
       textConfig.render(
         canvas,
@@ -182,10 +187,10 @@ class _GameLayer extends DynamicLayer {
 
     cartridge.gameSprites.forEach((gameSprite) {
       if (gameSprite.active) {
-        final pos = Position(gameSprite.x, gameSprite.y);
-        sprites[gameSprite.spriteName].renderPosition(
+        final pos = Vector2(gameSprite.x, gameSprite.y);
+        sprites[gameSprite.spriteName].render(
           canvas,
-          pos,
+          position: pos,
         );
       }
     });

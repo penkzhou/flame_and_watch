@@ -1,13 +1,13 @@
-import 'package:flame_and_watch/widgets/option_button.dart';
-import 'package:flutter/material.dart';
+import 'package:flame/game.dart';
+import 'package:flame_and_watch/game/clock_game.dart';
+import 'package:flame_and_watch/game/game.dart';
+import 'package:flame_and_watch/game/parachute_game.dart';
+import 'package:flame_and_watch/settings_manager.dart';
 import 'package:flame_and_watch/widgets/console/screen_console.dart';
 import 'package:flame_and_watch/widgets/console/side_console.dart';
-import 'package:flame_and_watch/settings_manager.dart';
+import 'package:flame_and_watch/widgets/option_button.dart';
 import 'package:flame_and_watch/widgets/swtich_button.dart';
-
-import '../../game/game.dart';
-import '../../game/parachute_game.dart';
-import '../../game/clock_game.dart';
+import 'package:flutter/material.dart';
 
 class Console extends StatefulWidget {
   @override
@@ -57,15 +57,24 @@ class _ConsoleState extends State<Console> {
                     children: [
                       Text(
                         'FLAME',
-                        style: TextStyle(fontFamily: 'Firealistic', fontSize: 20, color: Color(0xff8a3842)),
+                        style: TextStyle(
+                            fontFamily: 'Firealistic',
+                            fontSize: 20,
+                            color: Color(0xff8a3842)),
                       ),
                       Text(
                         '&',
-                        style: TextStyle(fontFamily: 'Firealistic', fontSize: 20, color: Color(0xff8a3842)),
+                        style: TextStyle(
+                            fontFamily: 'Firealistic',
+                            fontSize: 20,
+                            color: Color(0xff8a3842)),
                       ),
                       Text(
                         'WATCH',
-                        style: TextStyle(fontFamily: 'Firealistic', fontSize: 20, color: Color(0xff8a3842)),
+                        style: TextStyle(
+                            fontFamily: 'Firealistic',
+                            fontSize: 20,
+                            color: Color(0xff8a3842)),
                       ),
                     ],
                   ),
@@ -90,11 +99,13 @@ class _ConsoleState extends State<Console> {
                 final size = Size(constraints.maxWidth, constraints.maxHeight);
 
                 return FutureBuilder<FlameWatchGame>(
-                  future: isParachuteGame() ? loadParachuteGame(size) : loadClockGame(size),
+                  future: isParachuteGame()
+                      ? loadParachuteGame(size)
+                      : loadClockGame(size),
                   builder: (_, snapshot) {
                     _game = snapshot.data;
                     if (snapshot.hasData) {
-                      return Container(child: _game.widget);
+                      return Container(child: GameWidget(game: _game));
                     }
 
                     return Container();

@@ -11,8 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: ^0.22.1
-  shared_preferences: 0.5.7
+  flame: ^1.7.2
+  flame_audio: ^1.4.1
+  shared_preferences: ^2.1.0
+  intl: ^0.18.0
     
   cupertino_icons: ^0.1.3
 
