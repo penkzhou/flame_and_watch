@@ -163,8 +163,8 @@ class _GameLayer extends DynamicLayer {
   _GameLayer(this.sprites, this.cartridge, this.controller) {
     preProcessors.add(
       ShadowProcessor(
-        offset: Offset(2, 2),
-        opacity: 0.2,
+        offset: Offset(1, 1),
+        opacity: 0.05,
       ),
     );
   }
